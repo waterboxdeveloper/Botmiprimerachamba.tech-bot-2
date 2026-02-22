@@ -1,0 +1,135 @@
+# 🔐 ENVIRONMENT & SECRETS (CRITICAL - NEVER COMMIT)
+.env
+.env.local
+.env.*.local
+.env.production.local
+config.json
+credentials.json
+keys.json
+secrets.json
+config/secrets/
+
+# 🐍 PYTHON
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# 🧪 TESTING & COVERAGE
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.hypothesis/
+*.cover
+*.py,cover
+.nox/
+
+# 🆔 IDE & EDITOR
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+.eclipse
+*.code-workspace
+
+# 🖥️ OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# 📝 LOGS
+*.log
+*.logs
+logs/
+log/
+*.log.*
+
+# 📦 BUILD & DIST
+dist/
+build/
+*.egg-info/
+.eggs/
+*.whl
+*.zip
+*.tar.gz
+
+# 🗄️ DATABASE (SQLite - no longer used, using Supabase)
+*.db
+*.sqlite
+*.sqlite3
+bot2mvp.db
+*.dbm
+.cache/
+
+# 📂 EXTERNAL PROJECTS
+jobspy-api/
+
+# 🐳 DOCKER (NOTA: .dockerignore SÍ se commitea, los otros NO)
+Dockerfile.bak
+docker-compose.override.yml
+
+# 📁 LOCAL DEVELOPMENT
+.venv
+venv/
+.env.dev
+*.pid
+*.seed
+
+# 📊 COVERAGE REPORTS
+htmlcov/
+.coverage
+
+# 🔒 BACKUP & TEMP FILES
+*.bak
+*.backup
+*.swp
+*.tmp
+*~
+
+# 🚫 CREDENTIALS (EXTRA PARANOID)
+*secret*
+*token*
+*key*
+*password*
+*credential*
+aws_access_key_id
+aws_secret_access_key
+.aws/credentials
+.ssh/
+id_rsa
+id_rsa.pub

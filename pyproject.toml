@@ -9,6 +9,7 @@ dependencies = [
     "python-telegram-bot>=20.0",
     # Data Validation & Serialization
     "pydantic>=2.0",
+    "email-validator>=2.0",
     # AI & LLM
     "langchain>=0.1",
     "langchain-google-genai>=0.0.15",
@@ -16,14 +17,13 @@ dependencies = [
     # API & Async
     "requests>=2.31",
     "aiohttp>=3.8",
-    # Scheduling
-    "apscheduler>=3.10",
     # Configuration
     "python-dotenv>=1.0",
     # Google Sheets (Database)
     "google-auth-oauthlib>=1.0",
     "google-auth-httplib2>=0.2",
     "google-api-python-client>=2.0",
+    "supabase>=2.28.0",
 ]
 
 [project.optional-dependencies]

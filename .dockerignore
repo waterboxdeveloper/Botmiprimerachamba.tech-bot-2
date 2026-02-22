@@ -1,0 +1,90 @@
+# Environment & Secrets (NUNCA en Docker)
+.env
+.env.*
+!.env.example
+
+# Version Control
+.git
+.gitignore
+.gitattributes
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# Virtual environments
+.env
+.venv
+env
+venv
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs (no guardar logs en imagen)
+*.log
+logs/
+
+# Local development
+*.db
+*.sqlite
+*.sqlite3
+bot2mvp.db
+
+# Documentation (no necesario en image)
+documentation/
+tests/
+contexto/
+todo/
+
+# Build artifacts
+.cache/
+*.cache
+
+# Credentials (CRITICAL - NEVER)
+credentials.json
+keys.json
+secrets.json
+config.json
+
+# Node modules (si usas frontend)
+node_modules/
+package-lock.json
+yarn.lock
