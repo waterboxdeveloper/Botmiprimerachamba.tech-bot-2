@@ -359,24 +359,26 @@ Ambas muestran endpoints, parámetros y permiten hacer pruebas interactivas.
 
 ---
 
-## 🔄 Flujo de Integración con el Bot
+## 🔄 Flujo de Integración con el Bot (ON-DEMAND)
 
 ```
 1. Usuario en Telegram: /perfil [keywords]
    ↓
 2. Guardar keywords en Google Sheets
    ↓
-3. APScheduler ejecuta cada X horas
+3. Usuario en Telegram: /vacantes
    ↓
-4. Script Python lee Sheets (usuarios + keywords)
+4. Bot lee keywords de Sheets (ese usuario)
    ↓
-5. Por cada usuario:
-   - Construir search_term desde keywords
-   - Llamar a /api/v1/search_jobs
-   - Filtrar resultados relevantes
-   - Guardar en Sheets (vacantes encontradas)
+5. Bot construye search_term desde keywords
    ↓
-6. Bot envía resultados al usuario via Telegram
+6. Bot llama a JobSpy API: /api/v1/search_jobs
+   ↓
+7. JobSpy devuelve JSON (2-5 segundos)
+   ↓
+8. Bot personaliza con Gemini (1-2 segundos)
+   ↓
+9. Bot envía resultados al usuario via Telegram (en tiempo real)
 ```
 
 ---
@@ -392,6 +394,131 @@ Ambas muestran endpoints, parámetros y permiten hacer pruebas interactivas.
 
 ---
 
-**Creado**: 2026-01-31
-**Base**: Análisis oficial de rainmanjam/jobspy-api
-**Estado**: Listo para pruebas prácticas
+## 🎯 INSIGHTS DEL REPOSITORIO OFICIAL (2026-02-16)
+
+Tras leer README.md, FAQ.md, PERFORMANCE_TUNING.md y DEPLOYMENT.md del repo, encontramos:
+
+### 1. **CACHING NATIVO (1 hora por defecto)**
+- `ENABLE_CACHE=true` (default)
+- `CACHE_EXPIRY=3600` segundos
+- **Ventaja**: Si un usuario busca lo mismo 2 veces < 1 hora: respuesta instantánea
+- **Para el bot**: No necesitamos cache adicional, ya está integrado
+- **Implicación**: Resultados duplicados para el mismo usuario pueden venir en caché
+
+### 2. **RATE LIMITING (100 req/hora por defecto)**
+- `RATE_LIMIT_ENABLED=true`
+- `RATE_LIMIT_REQUESTS=100` por `RATE_LIMIT_TIMEFRAME=3600s`
+- **Comportamiento**: Error `429 Too Many Requests` si se excede
+- **Para el bot**: Nuestro sleep de 2-3s entre búsquedas (~720-1080 req/hora max) está DENTRO del límite ✅
+- **Recomendación**: No hacer ráfagas de búsquedas rápidas
+
+### 3. **MÁS PLATAFORMAS DISPONIBLES (No solo 3)**
+Además de Indeed, LinkedIn, Glassdoor:
+- `zip_recruiter` - USA principalmente
+- `google` - Requiere términos específicos
+- `bayt` - Oriente Medio (Middle East jobs)
+- `naukri` - India
+
+**Para el bot**: De momento solo Indeed/LinkedIn/Glassdoor, pero podemos expandir en futuro
+
+### 4. **LIMITACIONES DE PARÁMETROS (NO se pueden combinar)**
+
+**Indeed**:
+```
+❌ NO puedes usar juntos:
+  • hours_old + job_type + is_remote
+  • hours_old + easy_apply
+  • job_type + is_remote + easy_apply
+```
+
+**LinkedIn**:
+```
+❌ NO puedes usar juntos:
+  • hours_old + easy_apply
+```
+
+**Para FASE 6** (handler /vacantes): Usar UN filtro a la vez, no combinar
+
+### 5. **PAÍSES SOPORTADOS SON 60+, NO SOLO 12**
+```
+Argentina, Australia, Austria, Bahrain, Belgium, Brazil, Canada, Chile, China,
+Colombia, Costa Rica, Czech Republic, Denmark, Ecuador, Egypt, Finland, France,
+Germany, Greece, Hong Kong, Hungary, India, Indonesia, Ireland, Israel, Italy,
+Japan, Kuwait, Luxembourg, Malaysia, Mexico, Morocco, Netherlands, New Zealand,
+Nigeria, Norway, Oman, Pakistan, Panama, Peru, Philippines, Poland, Portugal,
+Qatar, Romania, Saudi Arabia, Singapore, South Africa, South Korea, Spain,
+Sweden, Switzerland, Taiwan, Thailand, Turkey, UK, USA, Ukraine,
+United Arab Emirates, Uruguay, Venezuela, Vietnam
+```
+
+**Para el bot**: Expandir VALID_COUNTRIES en jobspy_client.py cuando escalemos a más mercados
+
+### 6. **FEATURES ADICIONALES DISPONIBLES**
+
+#### Paginación:
+```bash
+?paginate=true&page=1&page_size=20
+```
+**Uso**: Para resultados grandes, mostrar en páginas
+
+#### Export CSV:
+```bash
+?format=csv
+```
+**Uso**: Permitir que usuario exporte resultados
+
+#### LinkedIn Full Descriptions:
+```bash
+?linkedin_fetch_description=true
+```
+**Costo**: Más lento (5-15s vs 0.6-1s)
+**Para el bot**: NO activar por defecto
+
+#### Enforce Annual Salary:
+```bash
+?enforce_annual_salary=true
+```
+**Uso**: Normalizar todos los salarios a anuales
+
+### 7. **ERROR HANDLING ROBUSTO**
+- API devuelve errores descriptivos CON SUGERENCIAS
+- Parámetros inválidos → recomienda valores válidos
+- Combinaciones inválidas → explica por qué
+
+**Para el bot**: Podemos parsear estos errores y mostrar mensajes amigables al usuario
+
+### 8. **OPCIONES DE DESCRIPCIÓN**
+- `description_format=markdown` (default) ✅
+- `description_format=html`
+
+**Para el bot**: Las descripciones vienen en markdown, PERFECTO para Telegram
+
+### 9. **MONITORING Y HEALTH CHECKS**
+```bash
+GET /health        # {status: "ok"}
+GET /ping          # {message: "pong"}
+```
+**Para el bot**: Podemos verificar API health antes de buscar
+
+---
+
+## 📊 RESUMEN DE RECOMENDACIONES
+
+| Item | Recomendación | Estado |
+|------|---------------|--------|
+| **Caching** | Usar nativo (ya está) | ✅ En uso |
+| **Rate Limit** | 2-3s entre búsquedas | ✅ En uso |
+| **Plataformas** | Indeed/LinkedIn/Glassdoor por ahora | ✅ En uso |
+| **Parámetros** | Validar combos en FASE 6 | ⏳ Próximo |
+| **Países** | Expandir lista VALID_COUNTRIES | ⏳ Futuro |
+| **Descripciones** | Mantener markdown | ✅ En uso |
+| **LinkedIn full desc** | NO activar por defecto | ✅ En uso |
+| **Paginación** | Usar si resultados > 50 | ⏳ Futuro |
+| **Export CSV** | Agregar como feature extra | ⏳ Futuro |
+| **Health checks** | Verificar antes de buscar | ⏳ FASE 6 |
+
+---
+
+**Actualizado**: 2026-02-16
+**Base**: Análisis oficial de rainmanjam/jobspy-api (README.md, FAQ.md, PERFORMANCE_TUNING.md, DEPLOYMENT.md)
+**Estado**: Listo para FASE 6 (/vacantes handler)

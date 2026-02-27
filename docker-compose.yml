@@ -1,0 +1,93 @@
+version: "3.9"
+
+services:
+  # Telegram Bot Service
+  telegram-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bot2mvp-telegram-bot
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Use service name for internal DNS resolution
+      JOBSPY_API_URL: http://jobspy-api:8000
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      # Persist logs outside container
+      - ./logs:/app/logs
+      # Optional: mount source code for development (comment out for production)
+      # - .:/app
+    depends_on:
+      jobspy-api:
+        condition: service_healthy
+    networks:
+      - app-network
+    # Resource limits (adjust as needed)
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # JobSpy API Service (Scraper)
+  jobspy-api:
+    build:
+      context: ./jobspy-api
+      dockerfile: Dockerfile
+    container_name: bot2mvp-jobspy-api
+    restart: unless-stopped
+    ports:
+      # Only accessible from host for security
+      - "127.0.0.1:8000:8000"
+    environment:
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      # Optional: mount source code for development
+      # - ./jobspy-api:/app
+      - jobspy-logs:/app/logs
+    networks:
+      - app-network
+    # Health check for API availability
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 1G
+        reservations:
+          cpus: "1"
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# Shared network for inter-service communication
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# Named volumes for data persistence
+volumes:
+  jobspy-logs:
+    driver: local

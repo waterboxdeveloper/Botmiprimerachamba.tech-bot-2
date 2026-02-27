@@ -11,25 +11,26 @@ Antes de cualquier sugerencia, Claude DEBE verificar:
 
 ### 📋 idea.md
 - **Problema**: Freelancers buscan vacantes de forma manual e ineficiente
-- **Solución**: Bot de Telegram con notificaciones personalizadas 1-2 veces al día
-- **Workflow**:
-  1. Usuario → `/perfil` (configura keywords: ux/ui, design system, etc)
-  2. Sistema → Scraping automático de vacantes
-  3. AI → LangChain + Gemini 2.5 Flash personalizan cada vacante
-  4. Bot → Envía resultados personalizados al usuario
-- **Storage**: Google Sheets (usuarios + vacantes simplificado)
+- **Solución**: Bot de Telegram con búsquedas on-demand, personalizadas en tiempo real
+- **Workflow (ON-DEMAND)**:
+  1. Usuario → `/perfil` (configura keywords: ux/ui, design system, remote, etc)
+  2. Usuario → `/vacantes` (BUSCA INMEDIATAMENTE)
+  3. Bot → JobSpy API devuelve empleos frescos (2-5 segundos)
+  4. AI → LangChain + Gemini 2.5 Flash personalizan cada vacante (1-2 segundos)
+  5. Bot → Envía resultados personalizados al usuario (en tiempo real)
+- **Storage**: Google Sheets (solo tabla USUARIOS, sin scheduler)
 - **JobSpy API**: rainmanjam/jobspy-api (DOCKERIZADO)
 
 ### 🛠️ stack.md
 - **Lenguaje**: Python 3.10+ con `uv` (NO pip)
-- **Bot**: python-telegram-bot
-- **Database**: Google Sheets
+- **Bot**: python-telegram-bot (on-demand, siempre escuchando)
+- **Database**: Google Sheets (solo tabla USUARIOS)
 - **Data Validation**: Pydantic>=2.0 (validación de User y Job models)
-- **AI**: LangChain + Gemini 2.5 Flash
-- **Scraping**: rainmanjam/jobspy-api (Docker)
-- **Scheduling**: APScheduler
+- **AI**: LangChain + Gemini 2.5 Flash (personalización on-demand)
+- **Scraping**: rainmanjam/jobspy-api (Docker, on-demand cuando usuario pide)
+- **Scheduler**: ~~APScheduler~~ NO necesario en MVP
 - **Package Manager**: `uv` (uv sync, uv pip, etc)
-- **Deployment**: Linux Server + systemd
+- **Deployment**: Linux Server + systemd (bot online 24/7)
 
 ### 🔍 scrapersdoc.md
 **OPCIÓN SELECCIONADA**: `rainmanjam/jobspy-api` ⭐

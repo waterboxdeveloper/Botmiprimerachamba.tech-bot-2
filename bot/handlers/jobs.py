@@ -35,7 +35,7 @@ from telegram.ext import ContextTypes, ConversationHandler
 
 from database.queries import get_user_profile, can_make_query, add_query_log
 from database.db import get_connection, close_connection
-from bot.config import TELEGRAM_BOT_TOKEN
+from bot.config import TELEGRAM_BOT_TOKEN, JOBSPY_API_URL
 from backend.scrapers.jobspy_client import JobSpyClient
 from backend.agents.job_matcher import JobMatcher
 
@@ -121,7 +121,7 @@ async def cmd_vacantes(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
         permitido, error_msg = can_make_query(
             telegram_id=telegram_id,
             admin_chat_id=admin_chat_id,
-            max_queries_per_day=3,
+            max_queries_per_day=2,  # Límite para usuarios normales (admin = ilimitado)
         )
 
         if not permitido:
@@ -209,7 +209,7 @@ async def cmd_vacantes(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
         )
 
         search_term = " ".join(user.keywords)
-        client = JobSpyClient()
+        client = JobSpyClient(api_url=JOBSPY_API_URL)
 
         jobs = client.search_jobs(
             keywords=search_term,

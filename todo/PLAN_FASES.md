@@ -2,20 +2,20 @@
 
 ## Contexto Consolidado
 
-**Objetivo**: Bot de Telegram que entrega vacantes personalizadas a freelancers.
+**Objetivo**: Bot de Telegram que entrega búsquedas de vacantes on-demand, personalizadas a freelancers.
 
-**Flujo**:
+**Flujo (On-Demand)**:
 1. Usuario `/perfil` → Configura keywords (ej: "python", "remote", "contract")
-2. Usuario `/vacantes` → Bot busca en JobSpy API con esas keywords
-3. JobSpy devuelve vacantes freshas (JSON)
+2. Usuario `/vacantes` → Bot busca INMEDIATAMENTE en JobSpy API con esas keywords
+3. JobSpy devuelve vacantes freshas (JSON en 2-5 segundos)
 4. Bot personaliza con Gemini ("Esta vacante te matchea porque...")
-5. Bot envía vacantes personalizadas a Telegram
+5. Bot envía vacantes personalizadas a Telegram (en tiempo real)
 
-**Tech Stack**: Python 3.10 + uv, SQLite (usuarios), Telegram, JobSpy API, LangChain + Gemini, APScheduler
+**Tech Stack**: Python 3.10 + uv, Google Sheets (usuarios), Telegram, JobSpy API, LangChain + Gemini
 
-**Base de Datos**: SQLite local (MVP) → Supabase luego
+**Base de Datos**: Google Sheets (MVP simplificado: solo tabla USUARIOS, sin scheduler)
 
-**JobSpy API**: rainmanjam/jobspy-api (Docker). Lee `tests/pruebasApi/HALLAZGOS_CONSOLIDADOS.md` si dudas.
+**JobSpy API**: rainmanjam/jobspy-api (Docker). Lee `contexto/JOBSPY_API_ANALYSIS.md` si dudas.
 
 ---
 
@@ -103,27 +103,29 @@
 
 ---
 
-## FASE 8: Scheduler (Notificaciones Automáticas)
+## FASE 8: Notificaciones Suscriptivas (OPCIONAL - Post-MVP)
 
-**Objetivo**: Bot envía notificaciones 1-2 veces al día sin que usuario pida.
+**Objetivo**: Usuarios pueden subscribirse a notificaciones automáticas (opcional, no en MVP on-demand).
 
-### Tareas
+**NOTA**: Saltar esta fase para MVP. El bot es on-demand por defecto.
+
+### Tareas (Si agregan notificaciones después)
 - [ ] `FASE_8_1.md` - Crear `backend/scheduler.py` (APScheduler setup)
-- [ ] `FASE_8_2.md` - Task: Scrape jobs cada X horas
-- [ ] `FASE_8_3.md` - Task: Personalize + Send notificaciones a todos los usuarios
-- [ ] `FASE_8_4.md` - Handler `/config` - Usuario configura frecuencia (1x día, 2x día)
+- [ ] `FASE_8_2.md` - Task: Scrape jobs cada X horas (solo para usuarios suscritos)
+- [ ] `FASE_8_3.md` - Task: Personalize + Send notificaciones a usuarios suscritos
+- [ ] `FASE_8_4.md` - Handler `/subscribe` - Usuario opta por notificaciones automáticas
 
 ---
 
 ## FASE 9: Main Entry Point
 
-**Objetivo**: Bot + Scheduler corriendo juntos.
+**Objetivo**: Bot on-demand corriendo, siempre online escuchando comandos.
 
 ### Tareas
-- [ ] `FASE_9_1.md` - Crear `main.py` (inicia bot + scheduler)
+- [ ] `FASE_9_1.md` - Crear `main.py` (inicia bot)
 - [ ] `FASE_9_2.md` - Manejo de graceful shutdown
-- [ ] `FASE_9_3.md` - Logging setup
-- [ ] `FASE_9_4.md` - Test en local
+- [ ] `FASE_9_3.md` - Logging setup (para debugging on-demand)
+- [ ] `FASE_9_4.md` - Test en local (simular usuarios pidiendo `/vacantes`)
 
 ---
 
@@ -179,10 +181,10 @@ FASE 11 (Polish)
 
 ---
 
-## MVP Mínimo (Para empezar a probar)
+## MVP Mínimo (Para empezar a probar) - ON-DEMAND
 
-Completar hasta **FASE 6**: Usuario puede `/perfil` + `/vacantes` y obtiene resultados frescos.
+**Completar hasta FASE 7**: Usuario puede `/perfil` + `/vacantes` y obtiene resultados personalizados en tiempo real.
 
-Después agregar:
-- FASE 7: AI personalización
-- FASE 8: Scheduler automático
+**Saltar FASE 8 por ahora**: El scheduler automático es opcional (post-MVP si quieren notificaciones).
+
+**Mantener FASE 9**: Bot online escuchando comandos 24/7.

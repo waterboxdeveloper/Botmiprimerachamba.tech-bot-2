@@ -28,9 +28,10 @@ uv sync                    # Instalar dependencias
 
 **Por qué**: Simple, visual, gratis. Abres la hoja y ves los datos.
 
-Dos hojas:
-- **Usuarios**: telegram_id, name, email, keywords, location, level, frequency, active, created_at
-- **Vacantes**: title, company, job_url, location, salary_min, salary_max, date_posted, sent_to
+Una hoja (modelo simplificado on-demand):
+- **Usuarios**: telegram_id, name, email, keywords, location, level, active, created_at
+
+**Nota**: No guardamos vacantes en Sheets. Solo buscamos on-demand cuando el usuario pide `/vacantes`.
 
 **Librería**:
 ```bash
@@ -65,6 +66,25 @@ uv pip install langchain langchain-google-genai google-generativeai
 
 **Necesitas**: API key de Gemini (gratis en Google AI Studio).
 
+### 📚 Documentación LangChain (Consultar cuando tengas dudas)
+
+- **Structured Output**: https://docs.langchain.com/oss/python/langchain/structured-output
+  - Cómo pedirle a Gemini que devuelva JSON formateado con `with_structured_output()`
+  - Soporta Pydantic models, JSON Schema, etc
+
+- **ChatGoogleGenerativeAI**: https://docs.langchain.com/oss/python/integrations/chat/google_generative_ai
+  - Cómo usar Gemini en LangChain
+  - `with_structured_output()` para forzar estructura en respuestas
+  - Métodos: JSON Schema (recomendado) vs Function Calling
+
+- **FewShotPromptTemplate**: https://python.langchain.com/api_reference/core/prompts/langchain_core.prompts.few_shot.FewShotPromptTemplate.html
+  - Cómo usar ejemplos estructurados (few-shot prompting)
+  - Forma exacta y precisa de enseñarle al LLM cómo responder
+  - Combinar con `with_structured_output()` para máxima precisión
+
+- **Overview**: https://docs.langchain.com/oss/python/langchain/overview
+  - Conceptos generales de LangChain
+
 ---
 
 ## 📱 Bot: Telegram
@@ -89,16 +109,6 @@ uv pip install python-telegram-bot
 Corre en Docker. Es la API que busca vacantes en LinkedIn, Indeed, etc.
 
 **Si tienes dudas**: Lee `tests/pruebasApi/HALLAZGOS_CONSOLIDADOS.md`
-
----
-
-## ⏰ Scheduler: APScheduler
-
-**Para qué**: Ejecutar tareas periódicamente (buscar vacantes cada día a las 9am, por ejemplo).
-
-```bash
-uv pip install apscheduler
-```
 
 ---
 
@@ -134,8 +144,8 @@ Crear `.env` en el root del proyecto:
 TELEGRAM_BOT_TOKEN=tu_token
 GEMINI_API_KEY=tu_key
 JOBSPY_API_URL=http://localhost:8000
+JOBSPY_API_KEY=tu_api_key
 GOOGLE_SHEETS_ID=tu_sheet_id
-NOTIFICATION_TIMEZONE=America/Bogota
 ```
 
 **Nunca** commitear `.env`.
@@ -153,10 +163,11 @@ uv pip install \
   langchain \
   langchain-google-genai \
   google-generativeai \
-  apscheduler \
   requests \
   python-dotenv
 ```
+
+**Nota**: ~~apscheduler~~ NO necesario en MVP on-demand.
 
 ---
 
@@ -166,11 +177,10 @@ uv pip install \
 |---|---|---|
 | Lenguaje | Python 3.10+ | Core |
 | Package Manager | uv | Instalar deps |
-| Database | Google Sheets | Guardar usuarios y vacantes |
+| Database | Google Sheets | Guardar usuarios (on-demand, no scheduler) |
 | Validación | Pydantic | Datos correctos |
 | AI | LangChain + Gemini | Personalizar vacantes |
 | Bot | python-telegram-bot | Interfaz Telegram |
-| Scraper | JobSpy API (Docker) | Buscar vacantes |
-| Scheduler | APScheduler | Tareas periódicas |
-| Deploy | Linux Server + systemd | Servidor |
+| Scraper | JobSpy API (Docker) | Buscar vacantes on-demand |
+| Deploy | Linux Server + systemd | Servidor (bot siempre online) |
 | Config | python-dotenv | Variables de entorno |

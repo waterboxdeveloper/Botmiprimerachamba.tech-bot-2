@@ -1,15 +1,14 @@
-# Bot MVP - Telegram Job Alerts
+# Bot MVP - Telegram Job Alerts (On-Demand)
 
-Telegram bot que envía alertas personalizadas de vacantes freelance a usuarios.
+Telegram bot que entrega búsquedas personalizadas de vacantes freelance on-demand.
 
 ## Stack
 
 - **Language**: Python 3.10+
-- **Bot**: python-telegram-bot
-- **Database**: Google Sheets
-- **AI**: LangChain + Gemini 2.5 Flash
-- **Job Scraping**: JobSpy API (rainmanjam/jobspy-api)
-- **Scheduling**: APScheduler
+- **Bot**: python-telegram-bot (on-demand, siempre escuchando)
+- **Database**: Google Sheets (tabla USUARIOS solamente)
+- **AI**: LangChain + Gemini 2.5 Flash (personalización on-demand)
+- **Job Scraping**: JobSpy API (rainmanjam/jobspy-api) - on-demand
 
 ## Quick Start
 

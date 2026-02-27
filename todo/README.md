@@ -32,7 +32,11 @@ todo/
 
 ## 🎯 Orden de Ejecución
 
-### ✅ FASE ACTUAL: Análisis de JobSpy API
+### ✅ MODELO ACTUALIZADO: ON-DEMAND (No Scheduler)
+
+El bot ahora busca vacantes **cuando el usuario pide** (`/vacantes`), no automáticamente.
+
+### ⏳ PRÓXIMAS FASES (después de pruebas)
 ```
 📁 pruebasApi/
 ├─ 01-SETUP.md              [10-15 min]  Levantar Docker
@@ -58,10 +62,10 @@ todo/
    - Modelos de datos (User, Job)
    - Queries básicas
 
-3. **FASE 3: Backend** (~120 min)
-   - Integración con JobSpy API
-   - APScheduler para búsquedas automáticas
-   - Lógica de filtrado y deduplicación
+3. **FASE 3: Backend** (~90 min)
+   - Integración con JobSpy API on-demand
+   - Cliente HTTP para llamadas a JobSpy
+   - Lógica de parsing y formateo
 
 4. **FASE 4: Bot** (~90 min)
    - Handlers de Telegram (`/perfil`, `/vacantes`, etc)

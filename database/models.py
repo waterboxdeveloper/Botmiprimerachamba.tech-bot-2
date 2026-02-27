@@ -4,7 +4,7 @@ Usuario y Job matching con rainmanjam/jobspy-api output
 Diseñados para trabajar con Google Sheets como database
 """
 
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr, field_validator
 from typing import Optional, List
 from datetime import datetime
 
@@ -15,7 +15,7 @@ class User(BaseModel):
     Almacenado en Google Sheets (Sheet: "Usuarios")
     Cada fila es un usuario
     """
-    telegram_id: str = Field(..., description="ID único del usuario en Telegram")
+    telegram_id: str = Field(..., min_length=1, description="ID único del usuario en Telegram")
     name: str = Field(..., min_length=1, description="Nombre del usuario")
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
@@ -28,13 +28,26 @@ class User(BaseModel):
         default="mid",
         description="Nivel de experiencia: junior, mid, senior"
     )
-    notification_frequency: str = Field(
-        default="2x_daily",
-        description="Frecuencia de notificaciones: 1x_daily, 2x_daily"
-    )
     is_active: bool = Field(default=True, description="Si el usuario está activo")
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
+
+    @field_validator('experience_level')
+    @classmethod
+    def validate_experience_level(cls, v):
+        """Validar que experience_level sea uno de los valores permitidos"""
+        valid_levels = ['junior', 'mid', 'senior']
+        if v not in valid_levels:
+            raise ValueError(f'experience_level debe ser uno de {valid_levels}, recibido: {v}')
+        return v
+
+    @field_validator('telegram_id')
+    @classmethod
+    def validate_telegram_id(cls, v):
+        """Validar que telegram_id no esté vacío"""
+        if not v or not v.strip():
+            raise ValueError('telegram_id no puede estar vacío')
+        return v
 
     class Config:
         json_schema_extra = {
@@ -42,10 +55,9 @@ class User(BaseModel):
                 "telegram_id": "123456789",
                 "name": "Juan Pérez",
                 "email": "juan@example.com",
-                "keywords": ["ux designer", "ui designer"],
+                "keywords": ["ux designer", "ui designer", "remote"],
                 "location_preference": "Remote",
-                "experience_level": "senior",
-                "notification_frequency": "2x_daily"
+                "experience_level": "senior"
             }
         }
 
@@ -72,8 +84,9 @@ class Job(BaseModel):
     Almacenado en Google Sheets (Sheet: "Vacantes")
     Cada fila es un trabajo
     """
+    id: Optional[str] = None  # ID único del trabajo (puede no existir en algunos casos)
     title: str
-    company: str
+    company: Optional[str] = None  # Algunos jobs no tienen empresa (ej: Indeed)
     company_url: Optional[str] = None
     job_url: str
     location: Optional[JobLocation] = None
@@ -128,26 +141,3 @@ class JobMatch(BaseModel):
         default_factory=list,
         description="Keywords del usuario que matchean con el job"
     )
-
-
-class NotificationBatch(BaseModel):
-    """
-    Lote de notificaciones para un usuario
-    Enviadas una o dos veces al día
-    """
-    telegram_id: str
-    user_name: str
-    job_matches: List[JobMatch]
-    batch_time: datetime
-    total_matches: int
-
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "telegram_id": "123456789",
-                "user_name": "Juan",
-                "job_matches": [],
-                "batch_time": "2024-01-31T10:00:00",
-                "total_matches": 3
-            }
-        }

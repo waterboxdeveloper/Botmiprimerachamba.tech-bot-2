@@ -1,0 +1,50 @@
+# Development version of docker-compose
+# Use: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+# This file overrides production settings for faster development iteration
+
+version: "3.9"
+
+services:
+  telegram-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # Rebuild on every run (slower but catches changes)
+      cache_from: []
+    # Mount source code for hot-reload (requires nodemon or similar)
+    volumes:
+      - .:/app
+      - /app/.venv  # Don't override venv in container
+      - ./logs:/app/logs
+    environment:
+      LOG_LEVEL: DEBUG
+      DEVELOPMENT_MODE: "true"
+    # Run with interactive terminal
+    stdin_open: true
+    tty: true
+    # Don't restart on failure (easier debugging)
+    restart: "no"
+    # More generous timeouts in development
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 1G
+
+  jobspy-api:
+    # Mount source code for development
+    volumes:
+      - ./jobspy-api:/app
+      - jobspy-logs:/app/logs
+    environment:
+      LOG_LEVEL: DEBUG
+      ENVIRONMENT: development
+      ENABLE_CACHE: "false"
+    # More generous settings for development
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 2G
+    # No restart (easier debugging)
+    restart: "no"
