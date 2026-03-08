@@ -97,7 +97,7 @@ bot2mvp.db
 .cache/
 
 # 📂 EXTERNAL PROJECTS
-jobspy-api/
+# jobspy-api/ ← COMMENTED OUT: Needed for Railway deployment
 
 # 🐳 DOCKER (NOTA: .dockerignore SÍ se commitea, los otros NO)
 Dockerfile.bak
