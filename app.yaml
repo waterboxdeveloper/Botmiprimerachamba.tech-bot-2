@@ -1,0 +1,63 @@
+{
+  "name": "bot2mvp-telegram",
+  "services": [
+    {
+      "name": "telegram-bot",
+      "github": {
+        "repo": "waterboxdeveloper/Botmiprimerachamba.tech-bot-2",
+        "branch": "main"
+      },
+      "build_command": "",
+      "run_command": "",
+      "dockerfile_path": "Dockerfile",
+      "source_dir": ".",
+      "envs": [
+        {
+          "key": "PYTHONUNBUFFERED",
+          "value": "1",
+          "scope": "RUN_AND_BUILD_TIME"
+        },
+        {
+          "key": "LOG_LEVEL",
+          "value": "INFO",
+          "scope": "RUN_AND_BUILD_TIME"
+        },
+        {
+          "key": "TELEGRAM_BOT_TOKEN",
+          "value": "${TELEGRAM_BOT_TOKEN}",
+          "scope": "RUN_AND_BUILD_TIME"
+        },
+        {
+          "key": "GEMINI_API_KEY",
+          "value": "${GEMINI_API_KEY}",
+          "scope": "RUN_AND_BUILD_TIME"
+        },
+        {
+          "key": "SUPABASE_URL",
+          "value": "${SUPABASE_URL}",
+          "scope": "RUN_AND_BUILD_TIME"
+        },
+        {
+          "key": "SUPABASE_KEY",
+          "value": "${SUPABASE_KEY}",
+          "scope": "RUN_AND_BUILD_TIME"
+        },
+        {
+          "key": "SUPABASE_SERVICE_ROLE",
+          "value": "${SUPABASE_SERVICE_ROLE}",
+          "scope": "RUN_AND_BUILD_TIME"
+        },
+        {
+          "key": "ADMIN_CHAT_ID",
+          "value": "${ADMIN_CHAT_ID}",
+          "scope": "RUN_AND_BUILD_TIME"
+        },
+        {
+          "key": "JOBSPY_API_URL",
+          "value": "${JOBSPY_API_URL}",
+          "scope": "RUN_AND_BUILD_TIME"
+        }
+      ]
+    }
+  ]
+}
