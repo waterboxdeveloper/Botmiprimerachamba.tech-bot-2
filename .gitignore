@@ -124,7 +124,9 @@ htmlcov/
 # 🚫 CREDENTIALS (EXTRA PARANOID)
 *secret*
 *token*
-*key*
+*.key
+*_key.*
+.env*key*
 *password*
 *credential*
 aws_access_key_id
