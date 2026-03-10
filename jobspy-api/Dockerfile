@@ -86,5 +86,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 # Expose port
 EXPOSE 8000
 
-# Run the confirmation script and then start the application
-CMD ["/bin/bash", "-c", "/app/scripts/confirm_env.sh && uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers"]
+# Start the application directly
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
